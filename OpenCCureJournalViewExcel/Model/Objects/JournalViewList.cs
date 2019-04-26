@@ -14,7 +14,7 @@ namespace OpenCCureJournalViewExcel.Model.Objects
         
         public List<JournalView> GetJournalViews()
         {
-            string commandString = string.Format("SELECT * FROM [{0}] WHERE 1 = 1 ORDER BY [{1}] DESC, [{2}] DESC", CJournalViews.TableName, CJournalViews.ServerDateTime, CJournalViews.MessageDateTime);
+            string commandString = string.Format("SELECT * FROM [{0}] ORDER BY [{1}] DESC, [{2}] DESC", CJournalViews.TableName, CJournalViews.ServerDateTime, CJournalViews.MessageDateTime);
             List<JournalView> journalViews = new List<JournalView>();
             using (OleDbConnection con = ConnectionString.NewConnection(Location))
             {
@@ -23,17 +23,14 @@ namespace OpenCCureJournalViewExcel.Model.Objects
                 OleDbDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    while (reader.Read())
+                    journalViews.Add(new JournalView
                     {
-                        journalViews.Add(new JournalView
-                        {
-                            MessageType = reader[CJournalViews.MessageType].ToString(),
-                            ServerDateTime = DateTime.Parse(reader[CJournalViews.ServerDateTime].ToString()),
-                            MessageDateTime = DateTime.Parse(reader[CJournalViews.MessageDateTime].ToString()),
-                            Object1Name = reader[CJournalViews.Object1Name].ToString(),
-                            MessageText = reader[CJournalViews.MessageText].ToString()
-                        });
-                    }
+                        MessageType = reader[CJournalViews.MessageType].ToString(),
+                        ServerDateTime = DateTime.Parse(reader[CJournalViews.ServerDateTime].ToString()),
+                        MessageDateTime = DateTime.Parse(reader[CJournalViews.MessageDateTime].ToString()),
+                        Object1Name = reader[CJournalViews.Object1Name].ToString(),
+                        MessageText = reader[CJournalViews.MessageText].ToString()
+                    });
                 }
                 con.Close();
             }
