@@ -20,12 +20,14 @@ namespace OpenCCureJournalViewExcel.View
         {
             InitializeComponent();
             _getDate = true;
+            _firstLoad = true;
         }
 
         public string Object1 => comboBox1.Text;
         public string Shift => comboBox2.Text;
         public DateTime SetDateTime => dateTimePicker1.Value;
         private bool _getDate;
+        private bool _firstLoad;
 
         private Form1Presentation _form1Presentation;
 
@@ -37,10 +39,17 @@ namespace OpenCCureJournalViewExcel.View
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            try
             {
-                _form1Presentation = new Form1Presentation(openFileDialog1.FileName);
-                LoadObject1Names();
+                if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    _form1Presentation = new Form1Presentation(openFileDialog1.FileName);
+                    LoadObject1Names();
+                }
+            }
+            catch (OleDbException)
+            {
+                MessageBox.Show("Invalid File");
             }
         }
 
@@ -56,16 +65,25 @@ namespace OpenCCureJournalViewExcel.View
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
+            LoadDataIntoDataGridView();
         }
 
         private void LoadDataIntoDataGridView()
         {
-            if (_form1Presentation != null)
+            if (_form1Presentation == null && !_firstLoad)
+            {
+                MessageBox.Show("No such log file loaded");
+            }
+            else if (_firstLoad)
+            {
+                _firstLoad = false;
+            }
+            else
             {
                 dataGridView1.Rows.Clear();
                 if (_getDate)
                 {
-                    foreach (JournalView journalView in _form1Presentation.GetJournalViewsByObject1(Object1, SetDateTime))
+                    foreach (JournalView journalView in _form1Presentation.GetJournalViewsByObject1(Object1, SetDateTime, Shift))
                     {
                         dataGridView1.Rows.Add
                             (
@@ -92,10 +110,6 @@ namespace OpenCCureJournalViewExcel.View
                     }
                 }
             }
-            else
-            {
-                MessageBox.Show("No such log file loaded");
-            }
         }
 
         private void LoadObject1Names()
@@ -112,11 +126,11 @@ namespace OpenCCureJournalViewExcel.View
             _getDate = !_getDate;
             if (_getDate)
             {
-                button2.Text = "Show Specific";
+                button2.Text = "Show All";
             }
             else
             {
-                button2.Text = "Show All";
+                button2.Text = "Show Specific";
             }
             if (_form1Presentation != null)
             {

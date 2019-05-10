@@ -28,5 +28,21 @@ namespace OpenCCureJournalViewExcel.Presentation
         public List<JournalView> GetJournalViewsByObject1(string object1) => _journalViewList.GetJournalViews().FindAll(item => item.Object1Name.Equals(object1) && item.MessageType.Equals(_messageType));
 
         public List<JournalView> GetJournalViewsByObject1(string object1, DateTime setDateTime) => _journalViewList.GetJournalViews().FindAll(item => item.Object1Name.Equals(object1) && item.MessageType.Equals(_messageType) && item.ServerDateTime.ToShortDateString() == setDateTime.ToShortDateString());
+
+        public List<JournalView> GetJournalViewsByObject1(string object1, DateTime setDateTime, string shift)
+        {
+            List<JournalView> journalViews = new List<JournalView>();
+            if (shift.Contains("Day"))
+            {
+                journalViews.AddRange(_journalViewList.GetJournalViews().FindAll(item => item.Object1Name.Equals(object1) && item.MessageType.Equals(_messageType) && item.ServerDateTime.ToShortDateString() == setDateTime.ToShortDateString()));
+            }
+            else if (shift.Contains("Night"))
+            {
+                journalViews.AddRange(_journalViewList.GetJournalViews().FindAll(item => item.Object1Name.Equals(object1) && item.MessageType.Equals(_messageType) && item.ServerDateTime.ToShortDateString() == setDateTime.ToShortDateString() && item.ServerDateTime.Hour >= 12));
+                DateTime tomorrow = setDateTime.AddDays(1);
+                journalViews.AddRange(_journalViewList.GetJournalViews().FindAll(item => item.Object1Name.Equals(object1) && item.MessageType.Equals(_messageType) && item.ServerDateTime.ToShortDateString() == tomorrow.ToShortDateString() && item.ServerDateTime.Hour <= 12));
+            }
+            return journalViews;
+        }
     }
 }

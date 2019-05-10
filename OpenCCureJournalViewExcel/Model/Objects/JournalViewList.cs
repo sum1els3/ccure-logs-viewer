@@ -34,7 +34,7 @@ namespace OpenCCureJournalViewExcel.Model.Objects
                 }
                 con.Close();
             }
-            return journalViews;
+            return journalViews.OrderBy(item => item.ServerDateTime).ToList();
         }
 
         public List<JournalView> GetJournalViewsByMessageType(string messageType) => GetJournalViews().FindAll(item => item.MessageType.Equals(messageType));
